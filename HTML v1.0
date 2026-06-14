@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Gerencia Academica</title>
+<link rel="icon" type="image/png" href="https://img.icons8.com/?size=160&id=8yiZgSMCYfJl&format=png"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --green-50:  #f0faf4;
+    --green-100: #d8f3e3;
+    --green-200: #a8e0c0;
+    --green-400: #4caf82;
+    --green-500: #2e9e6a;
+    --green-600: #1e7a50;
+    --green-700: #155c3b;
+    --white:     #ffffff;
+    --gray-50:   #f8f9fb;
+    --gray-100:  #f0f2f5;
+    --gray-200:  #e2e6ec;
+    --gray-400:  #9aa5b4;
+    --gray-600:  #4b5563;
+    --gray-800:  #1f2937;
+    --red-400:   #f87171;
+    --red-100:   #fee2e2;
+    --sidebar-w: 260px;
+    --radius:    12px;
+    --shadow:    0 4px 24px rgba(0,0,0,.07);
+    --transition: .22s cubic-bezier(.4,0,.2,1);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-800);
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ── SIDEBAR ─────────────────────────────────────────── */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: linear-gradient(160deg, #b8f0d0 0%, #7dd9a8 40%, #4caf82 100%);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+    box-shadow: 4px 0 20px rgba(46,158,106,.15);
+  }
+
+  .sidebar-logo {
+    padding: 28px 22px 20px;
+    border-bottom: 1px solid rgba(255,255,255,.35);
+  }
+  .sidebar-logo h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.45rem;
+    color: var(--green-700);
+    line-height: 1.1;
+  }
+  .sidebar-logo span {
+    font-family: 'DM Sans', sans-serif;
+    font-size: .72rem;
+    font-weight: 500;
+    color: var(--green-600);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .sidebar-nav { flex: 1; padding: 16px 10px; overflow-y: auto; }
+
+  .nav-section { margin-bottom: 6px; }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 9px;
+    cursor: pointer;
+    font-size: .875rem;
+    font-weight: 500;
+    color: var(--green-700);
+    transition: background var(--transition), color var(--transition);
+    user-select: none;
+    position: relative;
+  }
+  .nav-item:hover { background: rgba(255,255,255,.45); }
+  .nav-item.active { background: var(--white); color: var(--green-600); box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+
+  .nav-item .icon { font-size: 1.1rem; width: 22px; text-align: center; flex-shrink: 0; }
+  .nav-item .chevron {
+    margin-left: auto;
+    font-size: .75rem;
+    transition: transform var(--transition);
+    opacity: .7;
+  }
+  .nav-item.open .chevron { transform: rotate(90deg); }
+
+  .nav-sub {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height .3s cubic-bezier(.4,0,.2,1);
+  }
+  .nav-sub.open { max-height: 300px; }
+
+  .nav-sub-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px 8px 46px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: .83rem;
+    color: var(--green-700);
+    transition: background var(--transition);
+    user-select: none;
+  }
+  .nav-sub-item:hover { background: rgba(255,255,255,.4); }
+  .nav-sub-item.active { background: rgba(255,255,255,.6); font-weight: 600; }
+  .nav-sub-item .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green-500);
+    flex-shrink: 0;
+  }
+
+  /* ── MAIN ────────────────────────────────────────────── */
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    background: var(--white);
+    padding: 18px 32px;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 1px 8px rgba(0,0,0,.04);
+  }
+  .topbar-title { font-size: 1.1rem; font-weight: 600; color: var(--gray-800); }
+  .topbar-sub   { font-size: .8rem; color: var(--gray-400); margin-left: auto; }
+
+  .content { padding: 32px; flex: 1; }
+
+  /* ── CARDS / PANELS ──────────────────────────────────── */
+  .panel {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 28px 30px;
+    animation: fadeUp .3s ease;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .panel-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.3rem;
+    color: var(--green-600);
+    margin-bottom: 6px;
+  }
+  .panel-desc { font-size: .83rem; color: var(--gray-400); margin-bottom: 24px; }
+
+  /* ── FORM ────────────────────────────────────────────── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-grid.cols1 { grid-template-columns: 1fr; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  label { font-size: .78rem; font-weight: 600; color: var(--gray-600); letter-spacing: .03em; }
+
+  input, select {
+    padding: 10px 13px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .875rem;
+    color: var(--gray-800);
+    background: var(--white);
+    transition: border-color var(--transition), box-shadow var(--transition);
+    outline: none;
+  }
+  input:focus, select:focus {
+    border-color: var(--green-400);
+    box-shadow: 0 0 0 3px rgba(76,175,130,.15);
+  }
+
+  /* ── BUTTONS ─────────────────────────────────────────── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .875rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all var(--transition);
+  }
+  .btn-primary { background: var(--green-500); color: #fff; }
+  .btn-primary:hover { background: var(--green-600); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(46,158,106,.3); }
+  .btn-secondary { background: var(--gray-100); color: var(--gray-600); }
+  .btn-secondary:hover { background: var(--gray-200); }
+  .btn-danger { background: var(--red-100); color: #dc2626; }
+  .btn-danger:hover { background: #fecaca; }
+  .btn-sm { padding: 6px 12px; font-size: .78rem; }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+
+  /* ── TABLE ───────────────────────────────────────────── */
+  .table-wrap { overflow-x: auto; margin-top: 24px; border-radius: 10px; border: 1px solid var(--gray-200); }
+  table { width: 100%; border-collapse: collapse; font-size: .84rem; }
+  thead { background: var(--green-50); }
+  th { padding: 11px 14px; text-align: left; font-weight: 600; color: var(--green-700); font-size: .76rem; letter-spacing: .04em; text-transform: uppercase; }
+  td { padding: 11px 14px; border-top: 1px solid var(--gray-100); color: var(--gray-600); }
+  tr:hover td { background: var(--gray-50); }
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 99px;
+    font-size: .72rem;
+    font-weight: 600;
+  }
+  .badge-green { background: var(--green-100); color: var(--green-600); }
+  .badge-gray  { background: var(--gray-100);  color: var(--gray-600); }
+
+  /* ── ALERT ───────────────────────────────────────────── */
+  .alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: .84rem;
+    margin-bottom: 18px;
+    display: none;
+  }
+  .alert.show { display: flex; align-items: center; gap: 10px; }
+  .alert-success { background: var(--green-100); color: var(--green-700); }
+  .alert-error   { background: var(--red-100);   color: #b91c1c; }
+
+  /* ── RESULT CARD (consultas) ─────────────────────────── */
+  .result-header {
+    background: linear-gradient(135deg, var(--green-50), var(--green-100));
+    border: 1px solid var(--green-200);
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin-bottom: 20px;
+  }
+  .result-header h3 { font-family: 'DM Serif Display', serif; color: var(--green-700); font-size: 1.1rem; }
+  .result-header p  { font-size: .82rem; color: var(--green-600); margin-top: 3px; }
+
+  .stat-row { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+  .stat-card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+    padding: 14px 20px;
+    text-align: center;
+    flex: 1;
+    min-width: 120px;
+  }
+  .stat-card .val { font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: var(--green-500); }
+  .stat-card .lbl { font-size: .72rem; color: var(--gray-400); margin-top: 2px; }
+
+  /* ── DIVIDER ─────────────────────────────────────────── */
+  .divider { height: 1px; background: var(--gray-200); margin: 24px 0; }
+
+  /* ── HOME SCREEN ─────────────────────────────────────── */
+  .home-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+  .home-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 26px 24px;
+    cursor: pointer;
+    transition: transform var(--transition), box-shadow var(--transition);
+    border-top: 4px solid var(--green-400);
+  }
+  .home-card:hover { transform: translateY(-4px); box-shadow: 0 8px 28px rgba(0,0,0,.1); }
+  .home-card .hc-icon { font-size: 1.8rem; margin-bottom: 12px; }
+  .home-card .hc-title { font-weight: 600; font-size: .95rem; color: var(--gray-800); }
+  .home-card .hc-desc  { font-size: .78rem; color: var(--gray-400); margin-top: 4px; }
+
+  /* ── EMPTY STATE ─────────────────────────────────────── */
+  .empty { text-align: center; padding: 40px; color: var(--gray-400); font-size: .9rem; }
+  .empty span { font-size: 2rem; display: block; margin-bottom: 10px; }
+
+  /* ── HIDDEN ──────────────────────────────────────────── */
+  .page { display: none; }
+  .page.active { display: block; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--  SIDEBAR                                               -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<aside class="sidebar">
+<div class="sidebar-logo">
+    <img src="https://portal.ifce.edu.br/documents/5946/Fortaleza_logo_horizontal_colorida.png" style="width:100%; max-width:200px; margin-bottom:8px;"/>
+    <span>Sistema Academico</span>
+  </div>
+
+  <nav class="sidebar-nav">
+
+    <!-- Início -->
+    <div class="nav-section">
+      <div class="nav-item active" onclick="navigate('home', this)">
+        <img src="https://img.icons8.com/?size=64&id=v2LNL7ofGkrB&format=png" width="22" height="22"/> Início
+      </div>
+    </div>
+
+    <!-- Cadastros -->
+    <div class="nav-section">
+      <div class="nav-item" onclick="toggleGroup('grp-cadastros', this)">
+        <img src="https://img.icons8.com/?size=100&id=65548&format=png" width="22" height="22"/> Cadastros
+        <span class="chevron">›</span>
+      </div>
+      <div class="nav-sub" id="grp-cadastros">
+        <div class="nav-sub-item" onclick="navigate('cad-prof', this)">
+          <span class="dot"></span> Professores
+        </div>
+        <div class="nav-sub-item" onclick="navigate('cad-disc', this)">
+          <span class="dot"></span> Disciplinas
+        </div>
+      </div>
+    </div>
+
+    <!-- Registros -->
+    <div class="nav-section">
+      <div class="nav-item" onclick="toggleGroup('grp-registros', this)">
+        <img src="https://img.icons8.com/?size=160&id=fGxYUiOIO8vo&format=png" width="22" height="22"/> Registros
+        <span class="chevron">›</span>
+      </div>
+      <div class="nav-sub" id="grp-registros">
+        <div class="nav-sub-item" onclick="navigate('reg-aptidao', this)">
+          <span class="dot"></span> Aptidão Professor
+        </div>
+        <div class="nav-sub-item" onclick="navigate('reg-turma', this)">
+          <span class="dot"></span> Turmas Ministradas
+        </div>
+      </div>
+    </div>
+
+    <!-- Consultas -->
+    <div class="nav-section">
+      <div class="nav-item" onclick="toggleGroup('grp-consultas', this)">
+        <img src="https://img.icons8.com/?size=96&id=9OJR04KlavpV&format=png" width="22" height="22"/> Consultas
+        <span class="chevron">›</span>
+      </div>
+      <div class="nav-sub" id="grp-consultas">
+        <div class="nav-sub-item" onclick="navigate('con-professor', this)">
+          <span class="dot"></span> Por Professor
+        </div>
+        <div class="nav-sub-item" onclick="navigate('con-disciplina', this)">
+          <span class="dot"></span> Por Disciplina
+        </div>
+      </div>
+    </div>
+
+  </nav>
+</aside>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--  MAIN                                                  -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<main class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">Início</div>
+    <div class="topbar-sub">Instituto Federal do Ceará</div>
+  </div>
+
+  <div class="content">
+
+    <!-- ── HOME ─────────────────────────────────────────── -->
+    <div class="page active" id="page-home">
+      <div class="home-grid">
+        <div class="home-card" onclick="navigate('cad-prof', null)">
+          <div class="hc-icon"><img src="https://img.icons8.com/?size=160&id=m2cVQB077RAZ&format=png" width="48" height="48"/></div>
+          <div class="hc-title">Professores</div>
+          <div class="hc-desc">Incluir, alterar, excluir e consultar professores</div>
+        </div>
+        <div class="home-card" onclick="navigate('cad-disc', null)">
+          <div class="hc-icon"><img src="https://img.icons8.com/?size=96&id=IQH2JUs1TXwK&format=png" width="48" height="48"/></div>
+          <div class="hc-title">Disciplinas</div>
+          <div class="hc-desc">Gerenciar disciplinas do departamento</div>
+        </div>
+        <div class="home-card" onclick="navigate('reg-aptidao', null)">
+          <div class="hc-icon"><img src="https://img.icons8.com/?size=160&id=mdX5RtSF6afl&format=png" width="48" height="48"/></div>
+          <div class="hc-title">Aptidão</div>
+          <div class="hc-desc">Registrar quais disciplinas cada professor pode ministrar</div>
+        </div>
+        <div class="home-card" onclick="navigate('reg-turma', null)">
+          <div class="hc-icon"><img src="https://img.icons8.com/?size=100&id=3656&format=png" width="48" height="48"/></div>
+          <div class="hc-title">Turmas</div>
+          <div class="hc-desc">Registrar turmas ministradas por professores</div>
+        </div>
+        <div class="home-card" onclick="navigate('con-professor', null)">
+          <div class="hc-icon"><img src="https://img.icons8.com/?size=160&id=101781&format=png" width="48" height="48"/></div>
+          <div class="hc-title">Consulta por Professor</div>
+          <div class="hc-desc">Histórico de disciplinas, carga horária e alunos</div>
+        </div>
+        <div class="home-card" onclick="navigate('con-disciplina', null)">
+          <div class="hc-icon"><img src="https://img.icons8.com/?size=100&id=3651&format=png" width="48" height="48"/></div>
+          <div class="hc-title">Consulta por Disciplina</div>
+          <div class="hc-desc">Ver todos os professores aptos para uma disciplina</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CADASTRO PROFESSORES ──────────────────────────── -->
+    <div class="page" id="page-cad-prof">
+      <div class="panel">
+        <div class="hc-icon"><img src="https://img.icons8.com/?size=160&id=m2cVQB077RAZ&format=png" width="48" height="48"/></div>
+        <div class="panel-desc">Gerencie o cadastro de professores do departamento.</div>
+
+        <div id="alert-prof" class="alert"></div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Matrícula *</label>
+            <input id="prof-matricula" placeholder="Ex: P004"/>
+          </div>
+          <div class="form-group">
+            <label>Nome completo *</label>
+            <input id="prof-nome" placeholder="Ex: João da Silva"/>
+          </div>
+          <div class="form-group">
+            <label>E-mail *</label>
+            <input id="prof-email" type="email" placeholder="Ex: joao@univ.br"/>
+          </div>
+          <div class="form-group">
+            <label>Telefone</label>
+            <input id="prof-telefone" placeholder="Ex: (85) 99999-0000"/>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="salvarProfessor()">💾 Salvar</button>
+          <button class="btn btn-secondary" onclick="limparFormProf()">✕ Limpar</button>
+          <button class="btn btn-danger btn-sm" id="btn-del-prof" style="display:none" onclick="excluirProfessor()">🗑 Excluir</button>
+        </div>
+      </div>
+
+      <div class="table-wrap" style="margin-top:24px">
+        <table>
+          <thead>
+            <tr>
+              <th>Matrícula</th><th>Nome</th><th>E-mail</th><th>Telefone</th><th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tb-prof"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── CADASTRO DISCIPLINAS ──────────────────────────── -->
+    <div class="page" id="page-cad-disc">
+      <div class="panel">
+        <div class="hc-icon"><img src="https://img.icons8.com/?size=96&id=IQH2JUs1TXwK&format=png" width="48" height="48"/></div>
+        <div class="panel-desc">Gerencie as disciplinas oferecidas pelo departamento.</div>
+
+        <div id="alert-disc" class="alert"></div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Código *</label>
+            <input id="disc-codigo" placeholder="Ex: INF301"/>
+          </div>
+          <div class="form-group">
+            <label>Carga horária (h) *</label>
+            <input id="disc-carga" type="number" min="1" placeholder="Ex: 60"/>
+          </div>
+          <div class="form-group full">
+            <label>Nome da disciplina *</label>
+            <input id="disc-nome" placeholder="Ex: Programação Orientada a Objetos"/>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="salvarDisciplina()">💾 Salvar</button>
+          <button class="btn btn-secondary" onclick="limparFormDisc()">✕ Limpar</button>
+          <button class="btn btn-danger btn-sm" id="btn-del-disc" style="display:none" onclick="excluirDisciplina()">🗑 Excluir</button>
+        </div>
+      </div>
+
+      <div class="table-wrap" style="margin-top:24px">
+        <table>
+          <thead>
+            <tr>
+              <th>Código</th><th>Nome</th><th>Carga Horária</th><th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tb-disc"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── REGISTRO APTIDÃO ──────────────────────────────── -->
+    <div class="page" id="page-reg-aptidao">
+      <div class="panel">
+        <div class="hc-icon"><img src="https://img.icons8.com/?size=160&id=mdX5RtSF6afl&format=png" width="48" height="48"/></div>
+        <div class="panel-desc">Registre quais disciplinas cada professor está apto a ministrar.</div>
+
+        <div id="alert-apt" class="alert"></div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Professor *</label>
+            <select id="apt-professor" onchange="carregarAptidoes()">
+              <option value="">— Selecione —</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Disciplina *</label>
+            <select id="apt-disciplina">
+              <option value="">— Selecione —</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="registrarAptidao()">➕ Registrar Aptidão</button>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:20px" id="painel-aptidoes">
+        <div class="panel-title" style="font-size:1rem">Aptidões registradas</div>
+        <div class="table-wrap" style="margin-top:14px">
+          <table>
+            <thead>
+              <tr><th>Disciplina</th><th>Carga Horária</th><th>Ação</th></tr>
+            </thead>
+            <tbody id="tb-apt"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── REGISTRO TURMAS ───────────────────────────────── -->
+    <div class="page" id="page-reg-turma">
+      <div class="panel">
+        <div class="hc-icon"><img src="https://img.icons8.com/?size=100&id=3656&format=png" width="48" height="48"/></div>
+        <div class="panel-desc">Registre as turmas que um professor já ministrou.</div>
+
+        <div id="alert-turma" class="alert"></div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Código da turma *</label>
+            <input id="turma-codigo" placeholder="Ex: T007"/>
+          </div>
+          <div class="form-group">
+            <label>Semestre *</label>
+            <input id="turma-semestre" placeholder="Ex: 2024.2"/>
+          </div>
+          <div class="form-group">
+            <label>Professor *</label>
+            <select id="turma-professor">
+              <option value="">— Selecione —</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Disciplina *</label>
+            <select id="turma-disciplina">
+              <option value="">— Selecione —</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Nº de alunos *</label>
+            <input id="turma-alunos" type="number" min="1" placeholder="Ex: 40"/>
+          </div>
+          <div class="form-group">
+            <label>Horário *</label>
+            <select id="turma-horario">
+              <option value="">— Selecione —</option>
+              <option value="Manha">Manhã</option>
+              <option value="Tarde">Tarde</option>
+              <option value="Noite">Noite</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="salvarTurma()">💾 Registrar Turma</button>
+          <button class="btn btn-secondary" onclick="limparFormTurma()">✕ Limpar</button>
+        </div>
+      </div>
+
+      <div class="table-wrap" style="margin-top:24px">
+        <table>
+          <thead>
+            <tr>
+              <th>Código</th><th>Semestre</th><th>Professor</th>
+              <th>Disciplina</th><th>Alunos</th><th>Horário</th><th>Ação</th>
+            </tr>
+          </thead>
+          <tbody id="tb-turma"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── CONSULTA POR PROFESSOR ────────────────────────── -->
+    <div class="page" id="page-con-professor">
+      <div class="panel">
+        <div class="hc-icon"><img src="https://img.icons8.com/?size=160&id=101781&format=png" width="48" height="48"/></div>
+        <div class="panel-desc">Veja todas as disciplinas ministradas, carga horária total e total de alunos por disciplina.</div>
+
+        <div class="form-grid cols1">
+          <div class="form-group">
+            <label>Selecione o professor</label>
+            <select id="con-sel-professor" onchange="consultarProfessor()">
+              <option value="">— Selecione —</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div id="res-professor" style="margin-top:20px; display:none">
+        <div class="result-header">
+          <h3 id="res-prof-nome"></h3>
+          <p id="res-prof-email"></p>
+        </div>
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="val" id="st-turmas">0</div>
+            <div class="lbl">Turmas ministradas</div>
+          </div>
+          <div class="stat-card">
+            <div class="val" id="st-carga">0h</div>
+            <div class="lbl">Carga horária total</div>
+          </div>
+          <div class="stat-card">
+            <div class="val" id="st-alunos">0</div>
+            <div class="lbl">Total de alunos</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Disciplina</th><th>Turmas</th><th>CH por Turma</th>
+                <th>CH Total</th><th>Total Alunos</th>
+              </tr>
+            </thead>
+            <tbody id="tb-res-prof"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CONSULTA POR DISCIPLINA ───────────────────────── -->
+    <div class="page" id="page-con-disciplina">
+      <div class="panel">
+        <div class="hc-icon"><img src="https://img.icons8.com/?size=100&id=3651&format=png" width="48" height="48"/></div>
+        <div class="panel-desc">Selecione uma disciplina para ver todos os professores habilitados a ministrá-la.</div>
+
+        <div class="form-grid cols1">
+          <div class="form-group">
+            <label>Selecione a disciplina</label>
+            <select id="con-sel-disciplina" onchange="consultarDisciplina()">
+              <option value="">— Selecione —</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div id="res-disciplina" style="margin-top:20px; display:none">
+        <div class="result-header">
+          <h3 id="res-disc-nome"></h3>
+          <p id="res-disc-info"></p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Matrícula</th><th>Nome</th><th>E-mail</th><th>Telefone</th></tr>
+            </thead>
+            <tbody id="tb-res-disc"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--  JAVASCRIPT                                            -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<script>
+const API = `http://${window.location.hostname}:3000/api`;
+
+// ── Estado de edição ──────────────────────────────────────
+let editandoProf = null;
+let editandoDisc = null;
+
+// ── Navegação ─────────────────────────────────────────────
+const titulos = {
+  home:           'Início',
+  'cad-prof':     'Cadastro › Professores',
+  'cad-disc':     'Cadastro › Disciplinas',
+  'reg-aptidao':  'Registros › Aptidão do Professor',
+  'reg-turma':    'Registros › Turmas Ministradas',
+  'con-professor':'Consultas › Por Professor',
+  'con-disciplina':'Consultas › Por Disciplina',
+};
+
+function navigate(page, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.getElementById('topbar-title').textContent = titulos[page] || page;
+
+  // sidebar highlight
+  document.querySelectorAll('.nav-item, .nav-sub-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+
+  // carrega dados ao entrar na página
+  if (page === 'cad-prof')      carregarProfessores();
+  if (page === 'cad-disc')      carregarDisciplinas();
+  if (page === 'reg-aptidao')   { carregarSelectProf('apt-professor'); carregarSelectDisc('apt-disciplina'); }
+  if (page === 'reg-turma')     { carregarSelectProf('turma-professor'); carregarSelectDisc('turma-disciplina'); carregarTurmas(); }
+  if (page === 'con-professor') carregarSelectProf('con-sel-professor');
+  if (page === 'con-disciplina') carregarSelectDisc('con-sel-disciplina');
+}
+
+function toggleGroup(id, el) {
+  const sub = document.getElementById(id);
+  const isOpen = sub.classList.contains('open');
+  sub.classList.toggle('open');
+  el.classList.toggle('open');
+  if (!isOpen) el.classList.add('active');
+}
+
+// ── Alertas ───────────────────────────────────────────────
+function showAlert(id, tipo, msg) {
+  const el = document.getElementById(id);
+  el.className = `alert alert-${tipo} show`;
+  el.innerHTML = (tipo === 'success' ? '✅ ' : '❌ ') + msg;
+  setTimeout(() => el.classList.remove('show'), 4000);
+}
+
+// ── Fetch helper ──────────────────────────────────────────
+async function api(path, method = 'GET', body = null) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(API + path, opts);
+  const data = await r.json();
+  if (!r.ok) throw new Error(data.erro || 'Erro na requisição');
+  return data;
+}
+
+// ════════════════════════════════════════════════════════
+//  PROFESSORES
+// ════════════════════════════════════════════════════════
+async function carregarProfessores() {
+  const rows = await api('/professores');
+  const tb = document.getElementById('tb-prof');
+  tb.innerHTML = rows.length ? rows.map(p => `
+    <tr>
+      <td><span class="badge badge-gray">${p.matricula}</span></td>
+      <td><strong>${p.nome}</strong></td>
+      <td>${p.email}</td>
+      <td>${p.telefone || '—'}</td>
+      <td>
+        <button class="btn btn-secondary btn-sm" onclick='editarProf(${JSON.stringify(p)})'>✏️ Editar</button>
+      </td>
+    </tr>`).join('') : '<tr><td colspan="5"><div class="empty"><span>👨‍🏫</span>Nenhum professor cadastrado.</div></td></tr>';
+}
+
+function editarProf(p) {
+  editandoProf = p.matricula;
+  document.getElementById('prof-matricula').value = p.matricula;
+  document.getElementById('prof-matricula').disabled = true;
+  document.getElementById('prof-nome').value     = p.nome;
+  document.getElementById('prof-email').value    = p.email;
+  document.getElementById('prof-telefone').value = p.telefone || '';
+  document.getElementById('btn-del-prof').style.display = 'inline-flex';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function limparFormProf() {
+  editandoProf = null;
+  ['prof-matricula','prof-nome','prof-email','prof-telefone'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('prof-matricula').disabled = false;
+  document.getElementById('btn-del-prof').style.display = 'none';
+}
+
+async function salvarProfessor() {
+  const matricula = document.getElementById('prof-matricula').value.trim();
+  const nome      = document.getElementById('prof-nome').value.trim();
+  const email     = document.getElementById('prof-email').value.trim();
+  const telefone  = document.getElementById('prof-telefone').value.trim();
+  if (!matricula || !nome || !email) return showAlert('alert-prof', 'error', 'Preencha os campos obrigatórios.');
+  try {
+    if (editandoProf) {
+      await api(`/professores/${editandoProf}`, 'PUT', { nome, email, telefone });
+      showAlert('alert-prof', 'success', 'Professor atualizado com sucesso!');
+    } else {
+      await api('/professores', 'POST', { matricula, nome, email, telefone });
+      showAlert('alert-prof', 'success', 'Professor cadastrado com sucesso!');
+    }
+    limparFormProf();
+    carregarProfessores();
+  } catch(e) { showAlert('alert-prof', 'error', e.message); }
+}
+
+async function excluirProfessor() {
+  if (!confirm('Excluir este professor?')) return;
+  try {
+    await api(`/professores/${editandoProf}`, 'DELETE');
+    showAlert('alert-prof', 'success', 'Professor excluído.');
+    limparFormProf();
+    carregarProfessores();
+  } catch(e) { showAlert('alert-prof', 'error', e.message); }
+}
+
+// ════════════════════════════════════════════════════════
+//  DISCIPLINAS
+// ════════════════════════════════════════════════════════
+async function carregarDisciplinas() {
+  const rows = await api('/disciplinas');
+  const tb = document.getElementById('tb-disc');
+  tb.innerHTML = rows.length ? rows.map(d => `
+    <tr>
+      <td><span class="badge badge-green">${d.codigo_disciplina}</span></td>
+      <td><strong>${d.nome_disciplina}</strong></td>
+      <td>${d.carga_horaria}h</td>
+      <td>
+        <button class="btn btn-secondary btn-sm" onclick='editarDisc(${JSON.stringify(d)})'>✏️ Editar</button>
+      </td>
+    </tr>`).join('') : '<tr><td colspan="4"><div class="empty"><span>📚</span>Nenhuma disciplina cadastrada.</div></td></tr>';
+}
+
+function editarDisc(d) {
+  editandoDisc = d.codigo_disciplina;
+  document.getElementById('disc-codigo').value = d.codigo_disciplina;
+  document.getElementById('disc-codigo').disabled = true;
+  document.getElementById('disc-nome').value  = d.nome_disciplina;
+  document.getElementById('disc-carga').value = d.carga_horaria;
+  document.getElementById('btn-del-disc').style.display = 'inline-flex';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function limparFormDisc() {
+  editandoDisc = null;
+  ['disc-codigo','disc-nome','disc-carga'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('disc-codigo').disabled = false;
+  document.getElementById('btn-del-disc').style.display = 'none';
+}
+
+async function salvarDisciplina() {
+  const codigo        = document.getElementById('disc-codigo').value.trim();
+  const nome_disciplina = document.getElementById('disc-nome').value.trim();
+  const carga_horaria   = parseInt(document.getElementById('disc-carga').value);
+  if (!codigo || !nome_disciplina || !carga_horaria) return showAlert('alert-disc', 'error', 'Preencha todos os campos obrigatórios.');
+  try {
+    if (editandoDisc) {
+      await api(`/disciplinas/${editandoDisc}`, 'PUT', { nome_disciplina, carga_horaria });
+      showAlert('alert-disc', 'success', 'Disciplina atualizada!');
+    } else {
+      await api('/disciplinas', 'POST', { codigo_disciplina: codigo, nome_disciplina, carga_horaria });
+      showAlert('alert-disc', 'success', 'Disciplina cadastrada!');
+    }
+    limparFormDisc();
+    carregarDisciplinas();
+  } catch(e) { showAlert('alert-disc', 'error', e.message); }
+}
+
+async function excluirDisciplina() {
+  if (!confirm('Excluir esta disciplina?')) return;
+  try {
+    await api(`/disciplinas/${editandoDisc}`, 'DELETE');
+    showAlert('alert-disc', 'success', 'Disciplina excluída.');
+    limparFormDisc();
+    carregarDisciplinas();
+  } catch(e) { showAlert('alert-disc', 'error', e.message); }
+}
+
+// ════════════════════════════════════════════════════════
+//  SELECTS AUXILIARES
+// ════════════════════════════════════════════════════════
+async function carregarSelectProf(selectId) {
+  const rows = await api('/professores');
+  const sel = document.getElementById(selectId);
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Selecione —</option>' +
+    rows.map(p => `<option value="${p.matricula}">${p.nome}</option>`).join('');
+  if (cur) sel.value = cur;
+}
+
+async function carregarSelectDisc(selectId) {
+  const rows = await api('/disciplinas');
+  const sel = document.getElementById(selectId);
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Selecione —</option>' +
+    rows.map(d => `<option value="${d.codigo_disciplina}">${d.nome_disciplina}</option>`).join('');
+  if (cur) sel.value = cur;
+}
+
+// ════════════════════════════════════════════════════════
+//  APTIDÃO
+// ════════════════════════════════════════════════════════
+async function carregarAptidoes() {
+  const mat = document.getElementById('apt-professor').value;
+  const tb  = document.getElementById('tb-apt');
+  if (!mat) { tb.innerHTML = ''; return; }
+  const rows = await api(`/professores/${mat}/aptidoes`);
+  tb.innerHTML = rows.length ? rows.map(d => `
+    <tr>
+      <td><strong>${d.nome_disciplina}</strong></td>
+      <td>${d.carga_horaria}h</td>
+      <td>
+        <button class="btn btn-danger btn-sm"
+          onclick="removerAptidao('${mat}','${d.codigo_disciplina}')">🗑 Remover</button>
+      </td>
+    </tr>`).join('') : '<tr><td colspan="3"><div class="empty"><span>✅</span>Nenhuma aptidão registrada.</div></td></tr>';
+}
+
+async function registrarAptidao() {
+  const mat  = document.getElementById('apt-professor').value;
+  const disc = document.getElementById('apt-disciplina').value;
+  if (!mat || !disc) return showAlert('alert-apt', 'error', 'Selecione professor e disciplina.');
+  try {
+    await api(`/professores/${mat}/aptidoes`, 'POST', { codigo_disciplina: disc });
+    showAlert('alert-apt', 'success', 'Aptidão registrada com sucesso!');
+    carregarAptidoes();
+  } catch(e) { showAlert('alert-apt', 'error', e.message); }
+}
+
+async function removerAptidao(mat, disc) {
+  if (!confirm('Remover esta aptidão?')) return;
+  try {
+    await api(`/professores/${mat}/aptidoes/${disc}`, 'DELETE');
+    showAlert('alert-apt', 'success', 'Aptidão removida.');
+    carregarAptidoes();
+  } catch(e) { showAlert('alert-apt', 'error', e.message); }
+}
+
+// ════════════════════════════════════════════════════════
+//  TURMAS
+// ════════════════════════════════════════════════════════
+async function carregarTurmas() {
+  const rows = await api('/turmas');
+  const tb = document.getElementById('tb-turma');
+  tb.innerHTML = rows.length ? rows.map(t => `
+    <tr>
+      <td><span class="badge badge-gray">${t.codigo_turma}</span></td>
+      <td>${t.semestre}</td>
+      <td>${t.nome_professor}</td>
+      <td>${t.nome_disciplina}</td>
+      <td>${t.numero_alunos}</td>
+      <td><span class="badge badge-green">${t.horario}</span></td>
+      <td>
+        <button class="btn btn-danger btn-sm" onclick="excluirTurma('${t.codigo_turma}')">🗑</button>
+      </td>
+    </tr>`).join('') : '<tr><td colspan="7"><div class="empty"><span>🏫</span>Nenhuma turma registrada.</div></td></tr>';
+}
+
+async function salvarTurma() {
+  const codigo_turma       = document.getElementById('turma-codigo').value.trim();
+  const semestre           = document.getElementById('turma-semestre').value.trim();
+  const matricula_professor= document.getElementById('turma-professor').value;
+  const codigo_disciplina  = document.getElementById('turma-disciplina').value;
+  const numero_alunos      = parseInt(document.getElementById('turma-alunos').value);
+  const horario            = document.getElementById('turma-horario').value;
+  if (!codigo_turma || !semestre || !matricula_professor || !codigo_disciplina || !numero_alunos || !horario)
+    return showAlert('alert-turma', 'error', 'Preencha todos os campos obrigatórios.');
+  try {
+    await api('/turmas', 'POST', { codigo_turma, semestre, matricula_professor, codigo_disciplina, numero_alunos, horario });
+    showAlert('alert-turma', 'success', 'Turma registrada com sucesso!');
+    limparFormTurma();
+    carregarTurmas();
+  } catch(e) { showAlert('alert-turma', 'error', e.message); }
+}
+
+function limparFormTurma() {
+  ['turma-codigo','turma-semestre','turma-alunos'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('turma-professor').value = '';
+  document.getElementById('turma-disciplina').value = '';
+  document.getElementById('turma-horario').value = '';
+}
+
+async function excluirTurma(codigo) {
+  if (!confirm('Excluir esta turma?')) return;
+  try {
+    await api(`/turmas/${codigo}`, 'DELETE');
+    carregarTurmas();
+  } catch(e) { alert(e.message); }
+}
+
+// ════════════════════════════════════════════════════════
+//  CONSULTA POR PROFESSOR
+// ════════════════════════════════════════════════════════
+async function consultarProfessor() {
+  const mat = document.getElementById('con-sel-professor').value;
+  const res = document.getElementById('res-professor');
+  if (!mat) { res.style.display = 'none'; return; }
+  try {
+    const data = await api(`/consultas/professor/${mat}/historico-disciplinas`);
+    document.getElementById('res-prof-nome').textContent  = data.professor.nome;
+    document.getElementById('res-prof-email').textContent = data.professor.email;
+    document.getElementById('st-turmas').textContent = data.totais_gerais.total_turmas;
+    document.getElementById('st-carga').textContent  = data.totais_gerais.carga_horaria_total + 'h';
+    document.getElementById('st-alunos').textContent = data.totais_gerais.total_alunos;
+
+    const tb = document.getElementById('tb-res-prof');
+    tb.innerHTML = data.disciplinas.length ? data.disciplinas.map(d => `
+      <tr>
+        <td><strong>${d.nome_disciplina}</strong></td>
+        <td>${d.total_turmas}</td>
+        <td>${d.carga_horaria_por_turma}h</td>
+        <td><span class="badge badge-green">${d.carga_horaria_total}h</span></td>
+        <td>${d.total_alunos}</td>
+      </tr>`).join('') : '<tr><td colspan="5"><div class="empty"><span>📊</span>Sem histórico.</div></td></tr>';
+
+    res.style.display = 'block';
+  } catch(e) { alert(e.message); }
+}
+
+// ════════════════════════════════════════════════════════
+//  CONSULTA POR DISCIPLINA
+// ════════════════════════════════════════════════════════
+async function consultarDisciplina() {
+  const cod = document.getElementById('con-sel-disciplina').value;
+  const res = document.getElementById('res-disciplina');
+  if (!cod) { res.style.display = 'none'; return; }
+  try {
+    const data = await api(`/consultas/disciplina/${cod}/professores-aptos`);
+    document.getElementById('res-disc-nome').textContent = data.disciplina.nome_disciplina;
+    document.getElementById('res-disc-info').textContent =
+      `Carga horária: ${data.disciplina.carga_horaria}h  •  ${data.total_professores_aptos} professor(es) apto(s)`;
+
+    const tb = document.getElementById('tb-res-disc');
+    tb.innerHTML = data.professores.length ? data.professores.map(p => `
+      <tr>
+        <td><span class="badge badge-gray">${p.matricula}</span></td>
+        <td><strong>${p.nome}</strong></td>
+        <td>${p.email}</td>
+        <td>${p.telefone || '—'}</td>
+      </tr>`).join('') : '<tr><td colspan="4"><div class="empty"><span>🎓</span>Nenhum professor apto.</div></td></tr>';
+
+    res.style.display = 'block';
+  } catch(e) { alert(e.message); }
+}
+</script>
+</body>
+</html>
